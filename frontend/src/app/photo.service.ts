@@ -50,11 +50,5 @@ export class PhotoService {
     return response;
   }
 
-  // Get photo list
-  get_photo(size: number, page_no: number) {
-    const userid = this.#auth.$state().id ? this.#auth.$state().id : this.#auth.getGuestUserId();
-    return this.#http.get<StandardResponse<Photo[]>>(
-      `http://localhost:3000/photos?size=${size}&page_no=${page_no}&uid=${userid}`
-    );
-  }
+
 }

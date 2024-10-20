@@ -12,6 +12,7 @@ interface SignInResponse {
       _id: string;
       username: string;
       email: string;
+      profileImageURL?: string;
     }
   }
 }
@@ -20,14 +21,16 @@ export interface State {
   id: string,
   username: string,
   email: string,
-  token: string
+  token: string,
+  profileImageURL?: string,
 }
 
 export const initial_state = {
   id: "",
   username: '',
   email: '',
-  token: ''
+  token: '',
+  profileImageURL: ''
 }
 
 @Injectable({
@@ -63,7 +66,8 @@ export class AuthService {
                 id: response.data.user._id,
                 username: response.data.user.username,
                 email: response.data.user.email,
-                token: response.data.jwt
+                token: response.data.jwt,
+                profileImageURL: response.data.user.profileImageURL || ''
               });
             }
           })
@@ -91,16 +95,15 @@ export class AuthService {
     return this.$state().email;  // Method to get user's email
   }
 
-  getGuestUserId(): string {
-    let userId = localStorage.getItem('GUEST_USER_ID');
-    if (!userId) {
-      userId = this.generateUniqueId();
-      localStorage.setItem('GUEST_USER_ID', userId);
-    }
-    return userId;
+  getProfileImageURL(): string | null {
+    return this.$state().profileImageURL ?? null;
   }
 
-  private generateUniqueId(): string {
-    return 'guest_' + Math.random().toString(36).slice(2, 11);
+  updateProfileImageURL(newUrl: string) {
+    const currentState = this.$state();
+    this.$state.set({
+      ...currentState,
+      profileImageURL: newUrl
+    });
   }
 }

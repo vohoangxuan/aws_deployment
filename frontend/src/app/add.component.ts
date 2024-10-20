@@ -22,6 +22,13 @@ interface UploadResponse {
   template: `
     <div class="form-container">
       <h1>Upload Profile Image</h1>
+
+      <!-- Display the current profile image -->
+      <div *ngIf="currentProfileImageUrl" class="image-preview">
+        <h3>Current Profile Image:</h3>
+        <img [src]="currentProfileImageUrl" class="preview-img" alt="Current Profile Image">
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="submit()">
         <mat-form-field appearance="fill">
           <mat-label>Enter image title</mat-label>
@@ -36,6 +43,7 @@ interface UploadResponse {
       </form>
 
       <div *ngIf="previewUrl" class="image-preview">
+        <h3>Image Preview:</h3>
         <img [src]="previewUrl" class="preview-img" alt="Image Preview">
       </div>
     </div>
@@ -55,6 +63,7 @@ interface UploadResponse {
       padding: 10px;
       display: flex; 
       align-items: center; 
+      flex-direction: column;
     }
 
     .preview-img {
@@ -87,9 +96,11 @@ export class AddComponent {
 
   file: File | null = null;  // Initialize file as null to avoid non-null assertions
   previewUrl: string | ArrayBuffer | null = null;
+  currentProfileImageUrl: string | null = null;
   photo_service = inject(PhotoService);
   #auth = inject(AuthService);
   #router = inject(Router);
+
 
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -137,6 +148,9 @@ export class AddComponent {
               this.file = null;
               this.previewUrl = null;
               alert('Image uploaded successfully!');
+              const newProfileImageUrl = profileImageUploadURL.split('?')[0];  // Assuming the uploaded image URL can be derived from the pre-signed URL
+              this.#auth.updateProfileImageURL(newProfileImageUrl);
+              this.currentProfileImageUrl = newProfileImageUrl;
             } else {
               console.error('Image upload failed');
             }
@@ -152,6 +166,7 @@ export class AddComponent {
     }
   }
 
+
   constructor() {
     if (!this.#auth.is_logged_in()) {
       this.#router.navigate(['/login']).then(success => {
@@ -159,6 +174,9 @@ export class AddComponent {
       }).catch(err => {
         console.error('Navigation error:', err);
       });
+    } else {
+      // Load the current profile image URL from the AuthService
+      this.currentProfileImageUrl = this.#auth.getProfileImageURL();
     }
   }
 }
