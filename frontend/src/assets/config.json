@@ -1,0 +1,5 @@
+{
+  "loginApiUrl": "https://64bheq81vg.execute-api.us-east-1.amazonaws.com/prod/login",
+  "signupApiUrl": "https://64bheq81vg.execute-api.us-east-1.amazonaws.com/prod/signup",
+  "uploadApiUrl": "https://64bheq81vg.execute-api.us-east-1.amazonaws.com/prod/upload"
+}
