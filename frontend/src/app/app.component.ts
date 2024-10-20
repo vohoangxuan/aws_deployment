@@ -17,17 +17,11 @@ import { ConfigService } from './config.service';
   <form [formGroup]="form">
     <mat-toolbar color="primary">
       <a [routerLink]="['']" style="margin-right: 8px;"><mat-icon class="white-icon">home</mat-icon></a>
-      <span>Photo Sharing </span>
+      <span>Auth application </span>
       @if(auth.is_logged_in()) {
         <span class="user-greeting">Hello, {{ auth.$state().username }}!</span>
       }
       <span class="spacer"></span>
-      <div class="search-container">
-        <input class="input" matInput placeholder="Search term" formControlName="search">
-        <button mat-button (click)="clearSearch()">
-          <mat-icon>search</mat-icon>
-        </button>
-      </div>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>apps</mat-icon>
       </button>
@@ -46,12 +40,6 @@ import { ConfigService } from './config.service';
         <button mat-menu-item (click)="logout()">Logout</button>
       }
     </mat-menu>
-    
-    <!-- <h1>Welcome to {{title}}!</h1> -->
-      <!-- <a [routerLink]="['login']">Login</a>|
-      <a [routerLink]="['list']">Home</a>|
-      <a [routerLink]="['signup']">Signup</a> |
-      <a [routerLink]="['ownList']">My Photos</a>  -->
 
     <router-outlet />
     <router-outlet></router-outlet>
@@ -130,7 +118,7 @@ export class AppComponent {
   });
 
   auth = inject(AuthService);
-  title = 'PhotoSharing_frontend';
+  title = 'Frontend';
   #router = inject(Router);
   #configService = inject(ConfigService);
 
@@ -141,10 +129,6 @@ export class AppComponent {
     });
   };
 
-  clearSearch() {
-    console.log("after search.........");
-    this.#router.navigate(['/photos/search'], { queryParams: { search_title: this.form.value.search, size: 4, page_no: 1 } });
-  }
 
   ngOnInit(): void {
     // Load config.json when the app starts

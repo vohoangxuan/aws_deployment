@@ -5,11 +5,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="login()" class="login-form">
     <h1>Login</h1>
@@ -30,10 +31,9 @@ import { Router } from '@angular/router';
     </div>
   }
   <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Login</button>
-
-      <!--input placeholder="email" formControlName="email"/>
-      <input placeholder="password" formControlName="password"/>
-      <button type="submit" [disabled]="form.invalid">Login</button-->
+  <p style="align-content: center;margin-top:10px;">Don't have an account?
+    <a [routerLink]="['/signup']">Sign up here</a>
+  </p>
     </form>
   `,
   styles: `
