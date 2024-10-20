@@ -1,40 +1,42 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { AuthService, State } from './auth.service';
-import { Comment, Photo, StandardResponse } from '../../data.type';
-
-
-interface PhotoResponse {
-  success: boolean;
-  data: Photo
-}
+import { ConfigService } from './config.service';  // Import ConfigService
+import { Photo, StandardResponse } from '../../data.type';
+import { from, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class PhotoService {
   #http = inject(HttpClient);
   #auth = inject(AuthService);
-  #token = this.#auth.$state().token;
+  #configService = inject(ConfigService);  // Inject ConfigService
   $photo_id = signal<string>("");
 
+  constructor() { }
 
-
-  //Request pre-signed URL from the backend
+  // Request pre-signed URL from the backend
   getUploadUrl(data: { email: string, profileImageFilename: string, profileImageContentType: string }) {
-
     // Get the JWT token from AuthService
     const token = this.#auth.$state().token;
 
-    // Set up headers with Authorization
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`  // Include JWT token in Authorization header
-    });
+    // Load config before making the request
+    return from(this.#configService.loadConfig()).pipe(
+      switchMap(() => {
+        const uploadApiUrl = this.#configService.getUploadApiUrl();  // Use the dynamically loaded upload API URL
 
-    return this.#http.post<{ data: { profileImageUploadURL: string } }>(
-      'https://slx20f36ie.execute-api.us-east-1.amazonaws.com/prod/upload',
-      data
+        // Set up headers with Authorization
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`  // Include JWT token in Authorization header
+        });
+
+        return this.#http.post<{ data: { profileImageUploadURL: string } }>(
+          uploadApiUrl,
+          data,
+          { headers }
+        );
+      })
     );
   }
 
@@ -48,11 +50,11 @@ export class PhotoService {
     return response;
   }
 
-
+  // Get photo list
   get_photo(size: number, page_no: number) {
     const userid = this.#auth.$state().id ? this.#auth.$state().id : this.#auth.getGuestUserId();
-    return this.#http.get<StandardResponse<Photo[]>>(`http://localhost:3000/photos?size=${size}&page_no=${page_no}&uid=${userid}`);
+    return this.#http.get<StandardResponse<Photo[]>>(
+      `http://localhost:3000/photos?size=${size}&page_no=${page_no}&uid=${userid}`
+    );
   }
-
-
 }

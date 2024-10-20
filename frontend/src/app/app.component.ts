@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { AuthService, initial_state } from './auth.service';
+import { ConfigService } from './config.service';
 
 @Component({
   selector: 'app-root',
@@ -131,6 +132,7 @@ export class AppComponent {
   auth = inject(AuthService);
   title = 'PhotoSharing_frontend';
   #router = inject(Router);
+  #configService = inject(ConfigService);
 
   logout() {
     this.auth.$state.set(initial_state);
@@ -143,4 +145,14 @@ export class AppComponent {
     console.log("after search.........");
     this.#router.navigate(['/photos/search'], { queryParams: { search_title: this.form.value.search, size: 4, page_no: 1 } });
   }
+
+  ngOnInit(): void {
+    // Load config.json when the app starts
+    this.#configService.loadConfig().then(() => {
+      console.log('Configuration loaded:', this.#configService.getLoginApiUrl());  // Debugging purpose
+    }).catch((error) => {
+      console.error('Error loading configuration:', error);
+    });
+  }
+
 }
