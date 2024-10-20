@@ -1,5 +1,5 @@
 {
-  "loginApiUrl": "https://5fbwzp53u0.execute-api.us-east-1.amazonaws.com/prod/login",
-  "signupApiUrl": "https://5fbwzp53u0.execute-api.us-east-1.amazonaws.com/prod/signup",
-  "uploadApiUrl": "https://5fbwzp53u0.execute-api.us-east-1.amazonaws.com/prod/upload"
+  "loginApiUrl": "https://vgoqfx8fzk.execute-api.us-east-1.amazonaws.com/prod/login",
+  "signupApiUrl": "https://vgoqfx8fzk.execute-api.us-east-1.amazonaws.com/prod/signup",
+  "uploadApiUrl": "https://vgoqfx8fzk.execute-api.us-east-1.amazonaws.com/prod/upload"
 }
