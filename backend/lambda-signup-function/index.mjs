@@ -1,13 +1,13 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import bcrypt from "bcryptjs";  // Install this library for password hashing
+import bcrypt from "bcryptjs";  //library for password hashing
 
-const s3 = new S3Client({ region: "us-east-1" });
-const dynamoDB = new DynamoDBClient({ region: "us-east-1" });
+const s3 = new S3Client({ region: process.env.REGION });
+const dynamoDB = new DynamoDBClient({ process.env.REGION });
 
-const DYNAMODB_TABLE_NAME = "User";
-const BUCKET_NAME = "my-image-profile-bucket";
+const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;
+const BUCKET_NAME = process.env.BUCKET_NAME;
 
 export const handler = async (event) => {
   try {
@@ -22,7 +22,7 @@ export const handler = async (event) => {
     const userItem = {
       email: { S: email },
       name: { S: name },
-      passwordHash: { S: hashedPassword },  // Store hashed password, never store plain text
+      passwordHash: { S: hashedPassword },
       createdAt: { S: timestamp },
     };
 
