@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 interface UploadResponse {
   data: {
     profileImageUploadURL: string;
+    signedProfileImageURL: string;  // Add signedProfileImageURL to match the backend response
   };
 }
 
@@ -132,14 +133,14 @@ export class AddComponent {
     }
 
     if (this.form.valid && this.file) {  // Ensure file is set before proceeding
-      // Step 1: Request pre-signed URL from the backend
+      // Step 1: Request pre-signed URL and signed profile image URL from the backend
       this.photo_service.getUploadUrl({
         email: email,  // Use the email from AuthService
         profileImageFilename: this.file.name,
         profileImageContentType: this.file.type
       }).subscribe({
         next: (response: UploadResponse) => {  // Use next for success response
-          const { profileImageUploadURL } = response.data;
+          const { profileImageUploadURL, signedProfileImageURL } = response.data;
 
           // Step 2: Upload the image to S3 using the pre-signed URL
           this.photo_service.uploadImage(profileImageUploadURL, this.file!).then(uploadResult => {
@@ -149,9 +150,10 @@ export class AddComponent {
               this.file = null;
               this.previewUrl = null;
               alert('Image uploaded successfully!');
-              const newProfileImageUrl = profileImageUploadURL.split('?')[0];  // Assuming the uploaded image URL can be derived from the pre-signed URL
-              this.#auth.updateProfileImageURL(newProfileImageUrl);
-              this.currentProfileImageUrl = newProfileImageUrl;
+
+              // Step 4: Update the current profile image URL with the new signed URL
+              this.currentProfileImageUrl = signedProfileImageURL;
+              this.#auth.updateProfileImageURL(signedProfileImageURL);
             } else {
               console.error('Image upload failed');
             }
