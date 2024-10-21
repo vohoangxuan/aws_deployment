@@ -31,7 +31,7 @@ export class PhotoService {
           'Authorization': `Bearer ${token}`  // Include JWT token in Authorization header
         });
 
-        return this.#http.post<{ data: { profileImageUploadURL: string } }>(
+        return this.#http.post<{ data: { profileImageUploadURL: string; signedProfileImageURL: string } }>(
           uploadApiUrl,
           data,
           { headers }
