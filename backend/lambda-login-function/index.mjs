@@ -65,8 +65,8 @@ export const handler = async (event) => {
     const user = {
       email: userResult.Item.email.S,
       passwordHash: userResult.Item.passwordHash.S,
-	  profileImageURL: userResult.Item.profileImageURL ? userResult.Item.profileImageURL.S : null,
-    };
+      profileImageURL: userResult.Item.profileImageUrl ? userResult.Item.profileImageUrl.S : null,  // Correct attribute name
+};
 
     // Compare password
     const match = await compare(password, user.passwordHash);

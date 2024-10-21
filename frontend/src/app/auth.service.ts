@@ -60,6 +60,8 @@ export class AuthService {
         const loginApiUrl = this.#configService.getLoginApiUrl();  // Use the dynamically loaded login API URL
         return this.#http.post<SignInResponse>(loginApiUrl, credential).pipe(
           tap((response) => {
+            console.log("Login response:", response);
+
             if (response.success) {
               // Update the state after a successful login
               this.$state.set({
@@ -69,6 +71,7 @@ export class AuthService {
                 token: response.data.jwt,
                 profileImageURL: response.data.user.profileImageURL || ''
               });
+              console.log("Updated state with profile image URL:", this.$state());
             }
           })
         );
