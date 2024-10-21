@@ -7,11 +7,11 @@ import jsonwebtoken from 'jsonwebtoken';
 const { compare } = bcryptjs;
 const { sign } = jsonwebtoken;
 
-const DYNAMODB_TABLE_NAME = "User";
-const PROFILE_IMAGES_BUCKET_NAME = "my-profile-images-bucket";  
+const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;
+const PROFILE_IMAGES_BUCKET_NAME = process.env.PROFILE_IMAGES_BUCKET_NAME;  
 
-const dynamoDBClient = new DynamoDBClient({ region: "us-east-1" });
-const s3Client = new S3Client({ region: "us-east-1" });  
+const dynamoDBClient = new DynamoDBClient({ region: process.env.REGION });
+const s3Client = new S3Client({ region: process.env.REGION });  
 
 export const handler = async (event) => {
   try {
