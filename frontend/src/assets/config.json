@@ -1,5 +1,5 @@
 {
-  "loginApiUrl": "https://9cf2dskgmk.execute-api.us-east-1.amazonaws.com/prod/login",
-  "signupApiUrl": "https://9cf2dskgmk.execute-api.us-east-1.amazonaws.com/prod/signup",
-  "uploadApiUrl": "https://9cf2dskgmk.execute-api.us-east-1.amazonaws.com/prod/upload"
+  "loginApiUrl": "https://umvarfis82.execute-api.us-east-1.amazonaws.com/prod/login",
+  "signupApiUrl": "https://umvarfis82.execute-api.us-east-1.amazonaws.com/prod/signup",
+  "uploadApiUrl": "https://umvarfis82.execute-api.us-east-1.amazonaws.com/prod/upload"
 }
