@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import jwt from 'jsonwebtoken';  // Ensure to include this in your Lambda package or via a layer
@@ -77,22 +77,28 @@ export const handler = async (event) => {
       Key: profileImageFilename,
       ContentType: profileImageContentType,
     };
-    const command = new PutObjectCommand(uploadParams);
-    const profileImageUploadURL = await getSignedUrl(s3, command, { expiresIn: 60 });  // URL valid for 60 seconds
+    const putObjectCommand = new PutObjectCommand(uploadParams);
+    const profileImageUploadURL = await getSignedUrl(s3, putObjectCommand, { expiresIn: 60 });  // URL valid for 60 seconds
 
-    // Step 5: Update user's profileImageUrl in DynamoDB
-    const profileImageUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${profileImageFilename}`;
+    // Step 5: Store the object key (profileImageFilename) in DynamoDB
     const updateCommand = new UpdateItemCommand({
       TableName: DYNAMODB_TABLE_NAME,
       Key: { email: { S: email } },
-      UpdateExpression: "SET profileImageUrl = :url",
-      ExpressionAttributeValues: { ":url": { S: profileImageUrl } },
+      UpdateExpression: "SET profileImageUrl = :key",
+      ExpressionAttributeValues: { ":key": { S: profileImageFilename } },  // Save only the filename (object key)
       ReturnValues: "UPDATED_NEW"
     });
 
     await dynamoDB.send(updateCommand);
 
-    // Step 6: Return the pre-signed URL for the frontend to upload the image
+    // Step 6: Generate signed URL to view the uploaded profile image (valid for 1 hour)
+    const getObjectCommand = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: profileImageFilename
+    });
+    const signedProfileImageURL = await getSignedUrl(s3, getObjectCommand, { expiresIn: 3600 });  // URL valid for 1 hour
+
+    // Step 7: Return both the pre-signed upload URL and the signed view URL
     return {
       statusCode: 200,
       headers: {
@@ -104,7 +110,8 @@ export const handler = async (event) => {
         success: true,
         data: {
           message: "Profile image updated successfully!",
-          profileImageUploadURL
+          profileImageUploadURL,  // URL to upload the image
+          signedProfileImageURL   // URL to view the uploaded image
         }
       })
     };
