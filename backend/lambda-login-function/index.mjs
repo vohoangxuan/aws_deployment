@@ -1,4 +1,6 @@
 import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';  
 import bcryptjs from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 
@@ -6,7 +8,10 @@ const { compare } = bcryptjs;
 const { sign } = jsonwebtoken;
 
 const DYNAMODB_TABLE_NAME = "User";
+const PROFILE_IMAGES_BUCKET_NAME = "my-profile-images-bucket";  
+
 const dynamoDBClient = new DynamoDBClient({ region: "us-east-1" });
+const s3Client = new S3Client({ region: "us-east-1" });  
 
 export const handler = async (event) => {
   try {
@@ -65,8 +70,8 @@ export const handler = async (event) => {
     const user = {
       email: userResult.Item.email.S,
       passwordHash: userResult.Item.passwordHash.S,
-      profileImageURL: userResult.Item.profileImageUrl ? userResult.Item.profileImageUrl.S : null,  // Correct attribute name
-};
+      profileImageURL: userResult.Item.profileImageUrl ? userResult.Item.profileImageUrl.S : null,
+    };
 
     // Compare password
     const match = await compare(password, user.passwordHash);
@@ -82,6 +87,18 @@ export const handler = async (event) => {
       };
     }
 
+    // Generate a signed URL for the profile image if it exists
+    let signedProfileImageURL = null;
+    if (user.profileImageURL) {
+      const command = new GetObjectCommand({
+        Bucket: PROFILE_IMAGES_BUCKET_NAME,  
+        Key: user.profileImageURL  
+      });
+      
+      // Generate a signed URL with an expiration of 1 hour
+      signedProfileImageURL = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    }
+
     // Create JWT
     const jwt = sign(
       { _id: user.email, email: user.email },
@@ -89,24 +106,31 @@ export const handler = async (event) => {
       { expiresIn: '1h' }
     );
 
-    // Return JWT and user info with CORS headers
+    // Return JWT and user info with the signed URL
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',  // This allows cross-origin requests
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
       body: JSON.stringify({
         success: true,
-        data: { jwt, user: { _id: user.email, email: user.email, profileImageURL: user.profileImageURL, } },
+        data: {
+          jwt,
+          user: {
+            _id: user.email,
+            email: user.email,
+            profileImageURL: signedProfileImageURL, 
+          },
+        },
       }),
     };
   } catch (error) {
     return {
       statusCode: 500,
       headers: {
-        'Access-Control-Allow-Origin': '*',  // Include CORS headers even in error responses
+        'Access-Control-Allow-Origin': '*',  
         'Access-Control-Allow-Methods': 'POST',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
