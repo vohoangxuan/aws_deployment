@@ -18,9 +18,6 @@ import { ConfigService } from './config.service';
     <mat-toolbar color="primary">
       <a [routerLink]="['']" style="margin-right: 8px;"><mat-icon class="white-icon">home</mat-icon></a>
       <span>Auth application </span>
-      @if(auth.is_logged_in()) {
-        <span class="user-greeting">Hello, {{ auth.$state().username }}!</span>
-      }
       <span class="spacer"></span>
       <button mat-icon-button [matMenuTriggerFor]="menu">
         <mat-icon>apps</mat-icon>
