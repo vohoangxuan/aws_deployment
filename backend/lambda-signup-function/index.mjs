@@ -1,10 +1,11 @@
+//signup function
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import bcrypt from "bcryptjs";  //library for password hashing
 
 const s3 = new S3Client({ region: process.env.REGION });
-const dynamoDB = new DynamoDBClient({ process.env.REGION });
+const dynamoDB = new DynamoDBClient({ region: process.env.REGION });
 
 const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;
 const BUCKET_NAME = process.env.BUCKET_NAME;
