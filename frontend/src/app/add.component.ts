@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { PhotoService } from './photo.service';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 interface UploadResponse {
   data: {
@@ -18,7 +19,7 @@ interface UploadResponse {
 @Component({
   selector: 'app-add',
   standalone: true,
-  imports: [ReactiveFormsModule, MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule, MatCardModule, MatButtonModule, MatFormFieldModule, MatInputModule, CommonModule],
   template: `
     <div class="form-container">
       <h1>Upload Profile Image</h1>
