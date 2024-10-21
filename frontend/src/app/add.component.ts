@@ -125,6 +125,7 @@ export class AddComponent {
     }
   }
 
+
   submit() {
     const email = this.#auth.getUserEmail();  // Get the user's email from AuthService
     if (!email) {
@@ -132,7 +133,7 @@ export class AddComponent {
       return;
     }
 
-    if (this.form.valid && this.file) {  // Ensure file is set before proceeding
+    if (this.form.valid && this.file) {
       // Step 1: Request pre-signed URL and signed profile image URL from the backend
       this.photo_service.getUploadUrl({
         email: email,  // Use the email from AuthService
