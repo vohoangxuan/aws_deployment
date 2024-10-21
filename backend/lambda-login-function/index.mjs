@@ -65,6 +65,7 @@ export const handler = async (event) => {
     const user = {
       email: userResult.Item.email.S,
       passwordHash: userResult.Item.passwordHash.S,
+	  profileImageURL: userResult.Item.profileImageURL ? userResult.Item.profileImageURL.S : null,
     };
 
     // Compare password
@@ -98,7 +99,7 @@ export const handler = async (event) => {
       },
       body: JSON.stringify({
         success: true,
-        data: { jwt, user: { _id: user.email, email: user.email } },
+        data: { jwt, user: { _id: user.email, email: user.email, profileImageURL: user.profileImageURL, } },
       }),
     };
   } catch (error) {
